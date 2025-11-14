@@ -610,8 +610,8 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- 📫 Report issues on [GitHub Issues](https://github.com/yourusername/translation_manager/issues)
-- 💬 Discuss on [GitHub Discussions](https://github.com/yourusername/translation_manager/discussions)
+- 📫 Report issues on [GitHub Issues](https://edkluivert/yourusername/translation_manager/issues)
+- 💬 Discuss on [GitHub Discussions](https://edkluivert/yourusername/translation_manager/discussions)
 - ⭐ Star the repo if you find it useful!
 
 ---
