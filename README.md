@@ -17,7 +17,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  translation_manager: ^2.0.0
+  translation_manager: ^2.0.1
 ```
 
 **Optional:** For state management example with Bloc:
@@ -45,28 +45,49 @@ import 'package:translation_manager/translation_manager.dart';
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-        'en_US': {
-          'hello': 'Hello',
-          'welcome': 'Welcome @name',
-          'items': 'item',
-          'items_plural': 'items',
-          'greeting': 'Hello, @name! You have @count messages.',
-        },
-        'es_ES': {
-          'hello': 'Hola',
-          'welcome': 'Bienvenido @name',
-          'items': 'artículo',
-          'items_plural': 'artículos',
-          'greeting': 'Hola, @name! Tienes @count mensajes.',
-        },
-        'fr_FR': {
-          'hello': 'Bonjour',
-          'welcome': 'Bienvenue @name',
-          'items': 'article',
-          'items_plural': 'articles',
-          'greeting': 'Bonjour, @name! Vous avez @count messages.',
-        },
-      };
+    'en_US': {
+      'hello': 'Hello',
+      'welcome': 'Welcome @name',
+      'items': 'item',
+      'items_plural': 'items',
+      'greeting': 'Hello, @name! You have @count messages.',
+    },
+    'es_ES': {
+      'hello': 'Hola',
+      'welcome': 'Bienvenido @name',
+      'items': 'artículo',
+      'items_plural': 'artículos',
+      'greeting': 'Hola, @name! Tienes @count mensajes.',
+    },
+    'fr_FR': {
+      'hello': 'Bonjour',
+      'welcome': 'Bienvenue @name',
+      'items': 'article',
+      'items_plural': 'articles',
+      'greeting': 'Bonjour, @name! Vous avez @count messages.',
+    },
+    'de_DE': {
+      'hello': 'Hallo',
+      'welcome': 'Willkommen @name',
+      'items': 'Artikel',
+      'items_plural': 'Artikel',
+      'greeting': 'Hallo, @name! Du hast @count Nachrichten.',
+    },
+    'pt_BR': {
+      'hello': 'Olá',
+      'welcome': 'Bem-vindo @name',
+      'items': 'item',
+      'items_plural': 'itens',
+      'greeting': 'Olá, @name! Você tem @count mensagens.',
+    },
+    'ar_AE': {
+      'hello': 'مرحبا',
+      'welcome': 'مرحبا @name',
+      'items': 'عنصر',
+      'items_plural': 'عناصر',
+      'greeting': 'مرحبا، @name! لديك @count رسائل.',
+    },
+  };
 }
 ```
 
@@ -92,7 +113,25 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My App',
+      title: 'Translation Manager Demo',
+      locale: state.locale,
+      supportedLocales: context.read<LocaleCubit>().supportedLocales,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      // RTL Support: Automatically switch text direction based on locale
+      builder: (context, child) {
+        return Directionality(
+          textDirection: TranslationManager().textDirection,
+          child: child!,
+        );
+      },
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
       home: const HomePage(),
     );
   }
