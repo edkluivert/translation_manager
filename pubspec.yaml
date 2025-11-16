@@ -1,17 +1,22 @@
 name: translation_manager
-description: A translation managing package inspired by GetX
+description: A lightweight, GetX-inspired translation library for Flutter with automatic locale detection and Bloc integration.
 version: 1.0.0
 homepage: https://github.com/edkluivert/translation_manager
-
+repository: https://github.com/edkluivert/translation_manager
+issue_tracker: https://github.com/edkluivert/translation_manager/issues
 
 environment:
-  sdk: ^3.9.0
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.0.0'
 
-# Add regular dependencies here.
 dependencies:
-  # path: ^1.9.0
-  flutter_localization: ^0.3.3
+  flutter:
+    sdk: flutter
+
 
 dev_dependencies:
-  lints: ^6.0.0
-  test: ^1.25.6
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:

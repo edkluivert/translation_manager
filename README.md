@@ -17,10 +17,14 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  translation_manager: ^1.0.0
+  translation_manager: ^2.0.0
+```
+
+**Optional:** For state management example with Bloc:
+```yaml
+dependencies:
   flutter_bloc: ^8.1.3
-  flutter_localizations:
-    sdk: flutter
+  equatable: ^2.0.5
 ```
 
 Then run:
@@ -41,28 +45,28 @@ import 'package:translation_manager/translation_manager.dart';
 class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-    'en_US': {
-      'hello': 'Hello',
-      'welcome': 'Welcome @name',
-      'items': 'item',
-      'items_plural': 'items',
-      'greeting': 'Hello, @name! You have @count messages.',
-    },
-    'es_ES': {
-      'hello': 'Hola',
-      'welcome': 'Bienvenido @name',
-      'items': 'artículo',
-      'items_plural': 'artículos',
-      'greeting': 'Hola, @name! Tienes @count mensajes.',
-    },
-    'fr_FR': {
-      'hello': 'Bonjour',
-      'welcome': 'Bienvenue @name',
-      'items': 'article',
-      'items_plural': 'articles',
-      'greeting': 'Bonjour, @name! Vous avez @count messages.',
-    },
-  };
+        'en_US': {
+          'hello': 'Hello',
+          'welcome': 'Welcome @name',
+          'items': 'item',
+          'items_plural': 'items',
+          'greeting': 'Hello, @name! You have @count messages.',
+        },
+        'es_ES': {
+          'hello': 'Hola',
+          'welcome': 'Bienvenido @name',
+          'items': 'artículo',
+          'items_plural': 'artículos',
+          'greeting': 'Hola, @name! Tienes @count mensajes.',
+        },
+        'fr_FR': {
+          'hello': 'Bonjour',
+          'welcome': 'Bienvenue @name',
+          'items': 'article',
+          'items_plural': 'articles',
+          'greeting': 'Bonjour, @name! Vous avez @count messages.',
+        },
+      };
 }
 ```
 
@@ -70,8 +74,6 @@ class AppTranslations extends Translations {
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:translation_manager/translation_manager.dart';
 import 'translations/app_translations.dart';
 
@@ -89,23 +91,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LocaleCubit(),
-      child: BlocBuilder<LocaleCubit, LocaleState>(
-        builder: (context, state) {
-          return MaterialApp(
-            title: 'My App',
-            locale: state.locale,
-            supportedLocales: context.read<LocaleCubit>().supportedLocales,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            home: const HomePage(),
-          );
-        },
-      ),
+    return MaterialApp(
+      title: 'My App',
+      home: const HomePage(),
     );
   }
 }
@@ -130,10 +118,10 @@ class HomePage extends StatelessWidget {
         children: [
           // Translation with parameters
           Text('welcome'.trParams({'name': 'John'})),
-
+          
           // Plural translation
           Text('You have 5 ${'items'.trPlural('items_plural', 5)}'),
-
+          
           // Multiple parameters
           Text('greeting'.trParams({
             'name': 'Alice',
@@ -186,59 +174,44 @@ Text('You have $count ${'item'.trPlural('item_plural', count)}')
 ### Change Language
 
 ```dart
-// Using the Cubit (recommended)
-context.read<LocaleCubit>().changeLocale(const Locale('es', 'ES'));
+// Direct access to TranslationManager (works with any state management)
+TranslationManager().changeLocale(const Locale('es', 'ES'));
 
-// Or by language code
-context.read<LocaleCubit>().changeLocaleByCode('fr', 'FR');
-
-// Direct access to TranslationManager
-TranslationManager().changeLocale(const Locale('de', 'DE'));
+// In a StatefulWidget
+setState(() {
+  TranslationManager().changeLocale(const Locale('fr', 'FR'));
+});
 ```
+
+**Note:** See the [State Management Integration](#state-management-integration) section for examples with Bloc, Provider, Riverpod, etc.
 
 ### Get Current Locale
 
 ```dart
-// From Cubit state
-BlocBuilder<LocaleCubit, LocaleState>(
-builder: (context, state) {
-return Text('Current: ${state.locale.languageCode}');
-},
-)
-
-// From TranslationManager
 final currentLocale = TranslationManager().locale;
+print('Current language: ${currentLocale.languageCode}');
 ```
 
 ## Configuration
 
 ### Define Supported Locales
 
-In your `LocaleCubit`, you can customize the supported locales:
+You can create a wrapper to manage supported locales:
 
 ```dart
-import 'package:translation_manager/translation_manager.dart';
-
-class MyLocaleCubit extends LocaleCubit {
-  @override
-  List<Locale> get supportedLocales => [
+class AppLocale {
+  static final supportedLocales = [
     const Locale('en', 'US'),
     const Locale('es', 'ES'),
     const Locale('fr', 'FR'),
-    const Locale('de', 'DE'),
-    const Locale('pt', 'BR'),
-    const Locale('zh', 'CN'),
   ];
+  
+  static void changeLocale(Locale locale) {
+    if (supportedLocales.contains(locale)) {
+      TranslationManager().changeLocale(locale);
+    }
+  }
 }
-```
-
-Then use your custom cubit:
-
-```dart
-BlocProvider(
-create: (context) => MyLocaleCubit(),
-child: // ...
-)
 ```
 
 ### Fallback Locale
@@ -253,31 +226,111 @@ If a translation key is missing in the current locale, it will use the fallback 
 
 ## Advanced Features
 
+### State Management Integration
+
+The library works with any state management solution. Here's an example with Bloc:
+
+**See the `/example` folder for a complete Bloc implementation with:**
+- Automatic device locale detection
+- Locale state management with Cubit
+- Language picker dialog
+- Persistent storage with SharedPreferences
+
+Other state management examples:
+
+<details>
+<summary><b>Provider</b></summary>
+
+```dart
+class LocaleProvider extends ChangeNotifier {
+  Locale _currentLocale = const Locale('en', 'US');
+  
+  Locale get currentLocale => _currentLocale;
+  
+  void changeLocale(Locale locale) {
+    _currentLocale = locale;
+    TranslationManager().changeLocale(locale);
+    notifyListeners();
+  }
+}
+
+// Usage
+Provider.of<LocaleProvider>(context, listen: false).changeLocale(locale);
+```
+</details>
+
+<details>
+<summary><b>Riverpod</b></summary>
+
+```dart
+final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
+  return LocaleNotifier();
+});
+
+class LocaleNotifier extends StateNotifier<Locale> {
+  LocaleNotifier() : super(const Locale('en', 'US'));
+  
+  void changeLocale(Locale locale) {
+    state = locale;
+    TranslationManager().changeLocale(locale);
+  }
+}
+
+// Usage
+ref.read(localeProvider.notifier).changeLocale(locale);
+```
+</details>
+
+<details>
+<summary><b>GetX</b></summary>
+
+```dart
+class LocaleController extends GetxController {
+  final _locale = const Locale('en', 'US').obs;
+  
+  Locale get locale => _locale.value;
+  
+  void changeLocale(Locale locale) {
+    _locale.value = locale;
+    TranslationManager().changeLocale(locale);
+  }
+}
+
+// Usage
+Get.find<LocaleController>().changeLocale(locale);
+```
+</details>
+
 ### Language Picker Dialog
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:translation_manager/translation_manager.dart';
 
 void showLanguageDialog(BuildContext context) {
-  final cubit = context.read<LocaleCubit>();
-
+  final supportedLocales = [
+    const Locale('en', 'US'),
+    const Locale('es', 'ES'),
+    const Locale('fr', 'FR'),
+  ];
+  
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('Choose Language'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
-        children: cubit.supportedLocales.map((locale) {
+        children: supportedLocales.map((locale) {
           return ListTile(
             title: Text(_getLanguageName(locale)),
-            trailing: cubit.state.locale == locale
+            trailing: TranslationManager().locale == locale
                 ? const Icon(Icons.check, color: Colors.green)
                 : null,
             onTap: () {
-              cubit.changeLocale(locale);
+              TranslationManager().changeLocale(locale);
               Navigator.pop(context);
+              // Trigger rebuild if using setState
+              (context as Element).markNeedsBuild();
             },
           );
         }).toList(),
@@ -291,9 +344,6 @@ String _getLanguageName(Locale locale) {
     'en': 'English',
     'es': 'Español',
     'fr': 'Français',
-    'de': 'Deutsch',
-    'pt': 'Português',
-    'zh': '中文',
   };
   return names[locale.languageCode] ?? locale.languageCode;
 }
@@ -326,11 +376,11 @@ class PersistentLocaleCubit extends LocaleCubit {
 
   Future<void> _loadSavedLocale() async {
     final savedLocaleCode = _prefs.getString(_localeKey);
-
+    
     if (savedLocaleCode != null) {
       final parts = savedLocaleCode.split('_');
       final locale = Locale(parts[0], parts.length > 1 ? parts[1] : null);
-
+      
       if (supportedLocales.contains(locale)) {
         changeLocale(locale);
       }
@@ -610,8 +660,8 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
-- 📫 Report issues on [GitHub Issues](https://edkluivert/yourusername/translation_manager/issues)
-- 💬 Discuss on [GitHub Discussions](https://edkluivert/yourusername/translation_manager/discussions)
+- 📫 Report issues on [GitHub Issues](https://github.com/edkluivert/translation_manager/issues)
+- 💬 Discuss on [GitHub Discussions](https://github.com/edkluivert/translation_manager/discussions)
 - ⭐ Star the repo if you find it useful!
 
 ---
