@@ -153,42 +153,87 @@ class TranslationManager {
 /// Provides convenient extension methods on [String] for translations.
 ///
 /// These extensions enable GetX-style translation syntax.
+/// Extension methods that provide GetX-style translation helpers on [String].
+///
+/// Includes:
+/// - `.tr` for simple translation
+/// - `.trParams()` for parameterized translation
+/// - `.trPlural()` for plural-aware translation with @count support
 extension TranslationExtension on String {
-  /// Translates this string using the current locale.
+  /// Translates the string using the active locale from [TranslationManager].
   ///
   /// Example:
   /// ```dart
-  /// 'hello'.tr // Returns: 'Hello'
+  /// 'hello'.tr; // -> "Hello"
   /// ```
   String get tr => TranslationManager().translate(this);
 
-  /// Translates this string with parameter replacement.
+  /// Translates the string using the active locale and replaces placeholders
+  /// with the provided [params].
+  ///
+  /// Parameters:
+  /// - `params`: A map of placeholder-name to value.
   ///
   /// Example:
   /// ```dart
-  /// 'welcome'.trParams({'name': 'John'}) // Returns: 'Welcome John'
+  /// 'welcome_user'.trParams({'name': 'Alex'});
+  /// // Translation: "Welcome, @name"
+  /// // Result: "Welcome, Alex"
   /// ```
   String trParams([Map<String, String>? params]) {
     return TranslationManager().translate(this, params: params);
   }
 
-  /// Translates this string with plural support.
+  /// Translates the string using plural rules.
   ///
-  /// Uses this string as the singular form and [pluralKey] as the plural form.
-  /// Returns the singular form if [count] equals 1, otherwise returns the plural.
+  /// - Uses this string as the **singular** key.
+  /// - Uses [pluralKey] as the **plural** key.
+  /// - Automatically injects `@count` so translation strings can include it.
+  ///
+  /// The correct translation is chosen based on [count]:
+  /// - If `count == 1`, singular is used.
+  /// - Otherwise, plural is used.
+  ///
+  /// Additional parameters can be supplied via [params].
+  /// These will override or extend the automatically inserted `"count"` param.
   ///
   /// Example:
   /// ```dart
-  /// 'item'.trPlural('items_plural', 1)  // Returns: 'item'
-  /// 'item'.trPlural('items_plural', 5)  // Returns: 'items'
+  /// // Translations:
+  /// // "item": "@count item"
+  /// // "item_plural": "@count items"
+  ///
+  /// 'item'.trPlural('item_plural', 1); // -> "1 item"
+  /// 'item'.trPlural('item_plural', 5); // -> "5 items"
   /// ```
-  String trPlural(String pluralKey, int count) {
+  ///
+  /// Example with extra params:
+  /// ```dart
+  /// 'messages'.trPlural(
+  ///   'messages_plural',
+  ///   3,
+  ///   params: {'name': 'Alex'},
+  /// );
+  ///
+  /// // If plural is: "Alex, you have @count messages"
+  /// // Result: "Alex, you have 3 messages"
+  /// ```
+  String trPlural(
+      String pluralKey,
+      int count, {
+        Map<String, String>? params,
+      }) {
+    // Base params always include count
+    final baseParams = <String, String>{
+      'count': count.toString(),
+      if (params != null) ...params,
+    };
+
     return count == 1
-        ? TranslationManager().translate(this)
-        : TranslationManager().translate(pluralKey);
+        ? TranslationManager().translate(this, params: baseParams)
+        : TranslationManager().translate(pluralKey, params: baseParams);
   }
 }
-
 /// Base class for organizing translation maps.
 ///
 /// Extend this class to define your app's translations:

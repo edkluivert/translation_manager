@@ -1,6 +1,6 @@
 name: translation_manager
 description: A lightweight, GetX-inspired translation library for Flutter with automatic locale detection and Bloc integration.
-version: 2.0.2
+version: 2.0.3
 homepage: https://github.com/edkluivert/translation_manager
 repository: https://github.com/edkluivert/translation_manager
 issue_tracker: https://github.com/edkluivert/translation_manager/issues
