@@ -17,7 +17,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  translation_manager: ^2.0.1
+  translation_manager: ^2.0.2
 ```
 
 **Optional:** For state management example with Bloc:

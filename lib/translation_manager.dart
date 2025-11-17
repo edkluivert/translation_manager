@@ -140,7 +140,7 @@ class TranslationManager {
       });
     }
 
-    return translation??'';
+    return translation ?? '';
   }
 
   String _localeKey(Locale locale) {
