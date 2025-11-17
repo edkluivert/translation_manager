@@ -219,10 +219,10 @@ extension TranslationExtension on String {
   /// // Result: "Alex, you have 3 messages"
   /// ```
   String trPlural(
-      String pluralKey,
-      int count, {
-        Map<String, String>? params,
-      }) {
+    String pluralKey,
+    int count, {
+    Map<String, String>? params,
+  }) {
     // Base params always include count
     final baseParams = <String, String>{
       'count': count.toString(),
@@ -234,6 +234,7 @@ extension TranslationExtension on String {
         : TranslationManager().translate(pluralKey, params: baseParams);
   }
 }
+
 /// Base class for organizing translation maps.
 ///
 /// Extend this class to define your app's translations:
