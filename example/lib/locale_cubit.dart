@@ -1,10 +1,7 @@
 import 'dart:ui';
 import 'package:example/locale_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:translation_manager/translation_manager.dart';
-
-
 
 /// Manages locale state and automatically detects device locale.
 ///

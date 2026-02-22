@@ -5,23 +5,29 @@ import 'package:translation_manager/translation_manager.dart';
 class TestTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
-    'en_US': {
-      'hello': 'Hello',
-      'welcome': 'Welcome @name',
-      'item': 'item',
-      'item_plural': 'items',
-      'greeting': 'Hello @name, you have @count messages',
-    },
-    'es_ES': {
-      'hello': 'Hola',
-      'welcome': 'Bienvenido @name',
-      'item': 'artículo',
-      'item_plural': 'artículos',
-    },
-    'fr': {
-      'hello': 'Bonjour',
-    },
-  };
+        'en_US': {
+          'hello': 'Hello',
+          'welcome': 'Welcome @name',
+          'item': 'item',
+          'item_plural': 'items',
+          'greeting': 'Hello @name, you have @count messages',
+        },
+        'es_ES': {
+          'hello': 'Hola',
+          'welcome': 'Bienvenido @name',
+          'item': 'artículo',
+          'item_plural': 'artículos',
+        },
+        'fr': {
+          'hello': 'Bonjour',
+        },
+        'ar': {
+          'hello': 'مرحبا',
+        },
+        'he': {
+          'hello': 'שלום',
+        },
+      };
 }
 
 void main() {
@@ -50,7 +56,9 @@ void main() {
     });
 
     test('should add translations', () {
-      final translations = {'en_US': {'test': 'Test'}};
+      final translations = {
+        'en_US': {'test': 'Test'}
+      };
       manager.addTranslations(translations);
       expect(manager.translate('test'), equals('Test'));
     });
@@ -197,6 +205,46 @@ void main() {
       final translations = TestTranslations();
       expect(translations.keys, isA<Map<String, Map<String, String>>>());
       expect(translations.keys.containsKey('en_US'), isTrue);
+    });
+  });
+
+  group('Initialization', () {
+    test('should initialize with specific locale and fallback', () async {
+      await TranslationManager.init(
+        translations: TestTranslations().keys,
+        fallbackLocale: const Locale('en', 'US'),
+        initialLocale: const Locale('es', 'ES'),
+      );
+
+      expect(manager.locale, equals(const Locale('es', 'ES')));
+      expect(manager.fallbackLocale, equals(const Locale('en', 'US')));
+      expect('hello'.tr, equals('Hola'));
+    });
+  });
+
+  group('RTL / LTR Support', () {
+    test('should identify RTL locales correctly', () {
+      manager.changeLocale(const Locale('ar'));
+      expect(manager.isRTL, isTrue);
+      expect(manager.textDirection, equals(TextDirection.rtl));
+
+      manager.changeLocale(const Locale('he'));
+      expect(manager.isRTL, isTrue);
+      expect(manager.textDirection, equals(TextDirection.rtl));
+    });
+
+    test('should identify LTR locales correctly', () {
+      manager.changeLocale(const Locale('en', 'US'));
+      expect(manager.isRTL, isFalse);
+      expect(manager.textDirection, equals(TextDirection.ltr));
+
+      manager.changeLocale(const Locale('es', 'ES'));
+      expect(manager.isRTL, isFalse);
+      expect(manager.textDirection, equals(TextDirection.ltr));
+
+      manager.changeLocale(const Locale('fr'));
+      expect(manager.isRTL, isFalse);
+      expect(manager.textDirection, equals(TextDirection.ltr));
     });
   });
 }

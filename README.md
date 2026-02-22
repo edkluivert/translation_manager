@@ -98,11 +98,15 @@ import 'package:flutter/material.dart';
 import 'package:translation_manager/translation_manager.dart';
 import 'translations/app_translations.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize translations
   final translations = AppTranslations();
-  TranslationManager().addTranslations(translations.keys);
-  TranslationManager().setFallbackLocale(const Locale('en', 'US'));
+  await TranslationManager.init(
+    translations: translations.keys,
+    fallbackLocale: const Locale('en', 'US'),
+  );
 
   runApp(const MyApp());
 }
@@ -121,13 +125,6 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // RTL Support: Automatically switch text direction based on locale
-      builder: (context, child) {
-        return Directionality(
-          textDirection: TranslationManager().textDirection,
-          child: child!,
-        );
-      },
       theme: ThemeData(
         primarySwatch: Colors.blue,
         useMaterial3: true,
@@ -447,8 +444,10 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   
   final translations = AppTranslations();
-  TranslationManager().addTranslations(translations.keys);
-  TranslationManager().setFallbackLocale(const Locale('en', 'US'));
+  await TranslationManager.init(
+    translations: translations.keys,
+    fallbackLocale: const Locale('en', 'US'),
+  );
 
   runApp(MyApp(prefs: prefs));
 }

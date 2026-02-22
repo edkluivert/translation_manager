@@ -6,11 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:translation_manager/translation_manager.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
   final translations = AppTranslations();
-  TranslationManager().addTranslations(translations.keys);
-  TranslationManager().setFallbackLocale(const Locale('en', 'US'));
+  await TranslationManager.init(
+    translations: translations.keys,
+    fallbackLocale: const Locale('en', 'US'),
+  );
 
   runApp(const MyApp());
 }
@@ -33,17 +36,7 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            // RTL Support: Automatically switch text direction based on locale
-            builder: (context, child) {
-              return Directionality(
-                textDirection: TranslationManager().textDirection,
-                child: child!,
-              );
-            },
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              useMaterial3: true,
-            ),
+            theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
             home: const HomePage(),
           );
         },
@@ -99,10 +92,7 @@ class HomePage extends StatelessWidget {
 
             // Greeting with multiple parameters
             Text(
-              'greeting'.trParams({
-                'name': 'John',
-                'count': '5',
-              }),
+              'greeting'.trParams({'name': 'John', 'count': '5'}),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             const SizedBox(height: 20),
@@ -143,9 +133,7 @@ class HomePage extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               'Locale Information',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
+                              style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -161,7 +149,9 @@ class HomePage extends StatelessWidget {
                         ),
                         _buildInfoRow(
                           'Text direction',
-                          TranslationManager().isRTL ? 'RTL (Right-to-Left)' : 'LTR (Left-to-Right)',
+                          TranslationManager().isRTL
+                              ? 'RTL (Right-to-Left)'
+                              : 'LTR (Left-to-Right)',
                         ),
                         _buildInfoRow(
                           'Is RTL',
@@ -215,17 +205,11 @@ class HomePage extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black54),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -246,7 +230,12 @@ class HomePage extends StatelessWidget {
               shrinkWrap: true,
               children: cubit.supportedLocales.map((locale) {
                 final isSelected = cubit.state.locale == locale;
-                final isRTL = const ['ar', 'he', 'fa', 'ur'].contains(locale.languageCode);
+                final isRTL = const [
+                  'ar',
+                  'he',
+                  'fa',
+                  'ur',
+                ].contains(locale.languageCode);
 
                 return ListTile(
                   leading: Icon(

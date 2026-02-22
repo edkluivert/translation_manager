@@ -25,6 +25,37 @@ class TranslationManager {
 
   TranslationManager._internal();
 
+  /// Initializes the translation manager with translations and a default fallback.
+  ///
+  /// This must be called before running your application.
+  /// ```dart
+  /// void main() async {
+  ///   WidgetsFlutterBinding.ensureInitialized();
+  ///   final translations = AppTranslations();
+  ///   await TranslationManager.init(
+  ///     translations: translations.keys,
+  ///     fallbackLocale: const Locale('en', 'US'),
+  ///   );
+  ///   runApp(const MyApp());
+  /// }
+  /// ```
+  static Future<void> init({
+    required Map<String, Map<String, String>> translations,
+    Locale? fallbackLocale,
+    Locale? initialLocale,
+  }) async {
+    final instance = TranslationManager();
+    instance.addTranslations(translations);
+
+    if (fallbackLocale != null) {
+      instance.setFallbackLocale(fallbackLocale);
+    }
+
+    if (initialLocale != null) {
+      instance.changeLocale(initialLocale);
+    }
+  }
+
   Map<String, Map<String, String>> _translations = {};
   Locale _currentLocale = const Locale('en', 'US');
   Locale? _fallbackLocale;
